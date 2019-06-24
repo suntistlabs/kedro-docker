@@ -49,7 +49,6 @@ LICENSE_WHITELIST = (
     "BSD-3-CLAUSE",
     "BSD-LIKE",
     "ISC LICENSE",
-    "LGPL",
     "MIT",
     "MIT LICENSE",
     "OSI APPROVED :: BSD LICENSE",

@@ -4,5 +4,6 @@
   "python-dateutil": "Dual License",
   "kedro": null,
   "kedro-docker": null,
-  "certifi": "MPL-2.0"
+  "certifi": "MPL-2.0",
+  "chardet": "LGPL"
 }
