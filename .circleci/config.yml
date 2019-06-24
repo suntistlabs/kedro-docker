@@ -80,30 +80,6 @@ jobs:
             pip install pip-licenses
             chmod +x /home/circleci/project/license_checker/license_checker.py
             /home/circleci/project/license_checker/license_checker.py
-  publish_pypi:
-    docker:
-      - image: quantumblacklabs/kedro_builder:3.6
-    steps:
-      - checkout
-      - run:
-          name: Create conda environment
-          command: |
-            echo ". /home/circleci/miniconda/etc/profile.d/conda.sh" > $BASH_ENV
-            echo "conda deactivate; conda activate pkg-publisher" >> $BASH_ENV
-            . /home/circleci/miniconda/etc/profile.d/conda.sh
-            conda create --name=pkg-publisher python=3.6 -y
-            source $BASH_ENV
-      - run:
-          name: Install tools
-          command: |
-            make install-pip-setuptools
-            python -m pip install -U twine
-      - run:
-          name: Package Kedro-Docker
-          command: make package
-      - run:
-          name: Publish Kedro-Docker
-          command: python -m twine upload dist/*
 
 workflows:
   version: 2
@@ -113,12 +89,3 @@ workflows:
       - build_36
       - build_37
       - license_checker
-      - publish_pypi:
-          requires:
-            - build_35
-            - build_36
-            - build_37
-          filters:
-            branches:
-              only:
-                - master
