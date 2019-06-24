@@ -123,8 +123,8 @@ Options:
 
 ## Can I contribute?
 
-Yes! Want to help build Kedro-Docker? Check out our guide to [contributing](CONTRIBUTING.md).
+Yes! Want to help build Kedro-Docker? Check out our guide to [contributing](https://github.com/quantumblacklabs/kedro-docker/blob/develop/CONTRIBUTING.md).
 
 ## What licence do you use?
 
-Kedro-Docker is licensed under the [Apache 2.0](LICENSE.md) License.
+Kedro-Docker is licensed under the [Apache 2.0](https://github.com/quantumblacklabs/kedro-docker/blob/develop/LICENSE.md) License.
