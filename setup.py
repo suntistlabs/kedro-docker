@@ -58,7 +58,7 @@ with open(path.join(here, "README.md"), encoding="utf-8") as f:
 setup(
     name=name,
     version=version,
-    description="Kedro-Dockers makes it easy to package Kedro projects with Docker",
+    description="Kedro-Docker makes it easy to package Kedro projects with Docker.",
     long_description=readme,
     long_description_content_type="text/markdown",
     url="https://github.com/quantumblacklabs/kedro-docker",
