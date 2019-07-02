@@ -1,3 +1,14 @@
+# Release 0.1.1
+
+## Major features and improvements
+
+## Bug fixes and other changes
+* Remove smart quotes from the legal headers.
+
+## Breaking changes to the API
+
+## Thanks for supporting contributions
+
 # Release 0.1.0:
 
 The initial release of Kedro-Docker.
