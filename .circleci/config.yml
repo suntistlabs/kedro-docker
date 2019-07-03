@@ -50,6 +50,10 @@ jobs:
           name: Run all end to end tests
           command: |
             make e2e-tests
+      - run:
+          name: Check for legal compliance
+          command: |
+            make legal
   build_36:
     <<: *DEFAULT
     environment:
@@ -78,8 +82,8 @@ jobs:
           name: Check package licenses
           command: |
             pip install pip-licenses
-            chmod +x /home/circleci/project/license_checker/license_checker.py
-            /home/circleci/project/license_checker/license_checker.py
+            chmod +x /home/circleci/project/tools/license_checker.py
+            /home/circleci/project/tools/license_checker.py
 
 workflows:
   version: 2

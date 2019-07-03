@@ -25,3 +25,6 @@ e2e-tests:
 package: clean install
 	python setup.py clean --all
 	python setup.py sdist bdist_wheel
+
+legal:
+	python tools/license_and_headers.py
