@@ -3,8 +3,9 @@
 ## Major features and improvements
 
 ## Bug fixes and other changes
-* Add legal licence header checking as part of circleci
+* Add legal licence header checking as part of circleci.
 * Remove smart quotes from the legal headers.
+* Add Appveyor configuration.
 
 ## Breaking changes to the API
 
