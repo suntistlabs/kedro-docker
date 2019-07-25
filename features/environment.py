@@ -79,7 +79,9 @@ def before_all(context):
 
     # resolve the requirements using pip-compile from pip-tools due to
     # this bug in pip: https://github.com/pypa/pip/issues/988
-    call([context.python, "-m", "pip", "install", "-U", "pip", "pip-tools"])
+    #
+    # pip<19.2 can be unpinned when pip-tools>3.9.0 is released.
+    call([context.python, "-m", "pip", "install", "-U", "pip<19.2", "pip-tools"])
     pip_compile = str(bin_dir / "pip-compile")
     with tempfile.TemporaryDirectory() as tmpdirname:
         complied_reqs = str(Path(tmpdirname) / "requirements.txt")
