@@ -5,7 +5,6 @@ clean:
 
 install:
 	pip install .
-
 install-pip-setuptools:
 	python -m pip install -U "pip>=19.1.1, <20.0" "setuptools>=41.0.1, <42.0" wheel
 
