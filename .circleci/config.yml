@@ -6,7 +6,7 @@ jobs:
       image: circleci/classic:201711-01
       docker_layer_caching: true
     environment:
-      CONDA_ENV_PY_VERSION: 3.5.4
+      CONDA_ENV_PY_VERSION: 3.5
     steps:
       - checkout
       - run:
