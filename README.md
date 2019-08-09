@@ -121,6 +121,25 @@ Options:
 * `--docker-args` - optional string containing extra options for `docker run` command
 * `-h, --help` - show command help an exit.
 
+## Running Kedro-Docker with [Kedro-Viz](https://github.com/quantumblacklabs/kedro-viz/)
+
+These instructions allow you to access Kedro-Viz, Kedro's data pipeline visualisation tool, via Docker. In your terminal, run the following commands:
+
+```
+pip download -d data --no-deps kernelviz==0.8.1
+kedro docker build
+kedro docker cmd bash --docker-args="-it -u=0 -p=4141:4141"
+pip install data/*.whl
+kedro viz --host=0.0.0.0 --no-browser
+```
+And then open 127.0.0.1:4141 in your preferred browser. 
+
+Incidentally, if `kedro-viz` is already installed in the Docker container (via requirements) then you can run:
+
+```
+kedro docker cmd --docker-args="-p=4141:4141" kedro viz --host=0.0.0.0
+```
+
 ## Can I contribute?
 
 Yes! Want to help build Kedro-Docker? Check out our guide to [contributing](https://github.com/quantumblacklabs/kedro-docker/blob/develop/CONTRIBUTING.md).
