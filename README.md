@@ -123,7 +123,7 @@ Options:
 
 ## Running Kedro-Docker with [Kedro-Viz](https://github.com/quantumblacklabs/kedro-viz/)
 
-These instructions allow you to access Kedro-Viz, Kedro's data pipeline visualisation tool, via Docker. In your terminal, run the following commands:
+These instructions allow you to access [Kedro-Viz](https://github.com/quantumblacklabs/kedro-viz/), Kedro's data pipeline visualisation tool, via Docker. In your terminal, run the following commands:
 
 ```
 pip download -d data --no-deps kernelviz==0.8.1
