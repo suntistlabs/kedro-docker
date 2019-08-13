@@ -25,6 +25,7 @@ pip install kedro-docker
 ## How do I use Kedro-Docker?
 
 ### Prerequisites
+
 The following conditions must be true for Kedro-Docker to package your project:
 
 * Make sure you have [installed](https://docs.docker.com/install/) Docker
@@ -132,7 +133,8 @@ kedro docker cmd bash --docker-args="-it -u=0 -p=4141:4141"
 pip install data/*.whl
 kedro viz --host=0.0.0.0 --no-browser
 ```
-And then open 127.0.0.1:4141 in your preferred browser. 
+
+And then open `127.0.0.1:4141` in your preferred browser. 
 
 Incidentally, if `kedro-viz` is already installed in the Docker container (via requirements) then you can run:
 
