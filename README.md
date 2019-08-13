@@ -126,7 +126,7 @@ Options:
 These instructions allow you to access [Kedro-Viz](https://github.com/quantumblacklabs/kedro-viz/), Kedro's data pipeline visualisation tool, via Docker. In your terminal, run the following commands:
 
 ```
-pip download -d data --no-deps kernelviz==0.8.1
+pip download -d data --no-deps kedro-viz
 kedro docker build
 kedro docker cmd bash --docker-args="-it -u=0 -p=4141:4141"
 pip install data/*.whl
