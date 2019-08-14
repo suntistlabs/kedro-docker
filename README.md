@@ -134,9 +134,7 @@ pip install data/*.whl
 kedro viz --host=0.0.0.0 --no-browser
 ```
 
-And then open `127.0.0.1:4141` in your preferred browser. 
-
-Incidentally, if `kedro-viz` is already installed in the Docker container (via requirements) then you can run:
+And then open `127.0.0.1:4141` in your preferred browser. Incidentally, if `kedro-viz` is already installed in the Docker container (via requirements) then you can run:
 
 ```
 kedro docker cmd --docker-args="-p=4141:4141" kedro viz --host=0.0.0.0
