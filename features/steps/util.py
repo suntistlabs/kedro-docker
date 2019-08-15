@@ -28,8 +28,6 @@
 
 """Common functions for e2e testing."""
 
-import os
-import subprocess
 import tempfile
 import urllib
 import venv
