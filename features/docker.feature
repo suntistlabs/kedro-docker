@@ -89,7 +89,7 @@ Feature: Docker commands in new projects
     Given I have executed the kedro command "docker build"
     When I execute the kedro command "docker cmd kedro test"
     Then I should get a successful exit code
-    And I should get a message including "3 passed, 1 warnings"
+    And I should get a message including "2 passed"
     And I should get a message including "/usr/local/bin/python -m pytest"
 
   Scenario: Execute docker cmd without target command
