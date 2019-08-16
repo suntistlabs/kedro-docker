@@ -93,7 +93,9 @@ class TimeoutException(Exception):
     """Exception class for ``timeout()`` function below."""
 
 
-def timeout(func: Callable, duration: int = 10, **kwargs: Any) -> Any:
+def timeout(
+        func: Callable, duration: int = 10, **kwargs: Any
+) -> Any:
     """
     Run specified function until timeout. If success, return the return value
     of specified function. Otherwise throw TimeoutException.
@@ -116,7 +118,7 @@ def timeout(func: Callable, duration: int = 10, **kwargs: Any) -> Any:
     def wrapper_func():
         result_dict["result"] = func(**kwargs)
 
-    new_thread = Thread(target=wrapper_func)
+    new_thread = Thread(target=wrapper_func, daemon=True)
     new_thread.start()
 
     while time() <= end and new_thread.is_alive():

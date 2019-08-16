@@ -27,7 +27,10 @@
 # limitations under the License.
 
 """Behave step definitions for the cli_scenarios feature."""
-from time import sleep
+import fcntl
+import os
+import sys
+from time import sleep, time
 
 import behave
 import yaml
@@ -45,15 +48,57 @@ from features.steps.util import (
 OK_EXIT_CODE = 0
 
 
+def _read_lines_with_timeout(*streams, max_seconds=30, max_lines=100):
+    """
+    We want to read from multiple streams, merge outputs together,
+    limiting the number of lines we want.
+    Also don't try for longer than ``timeout`` seconds.
+    """
+    start_time = time()
+    lines = []
+    stream_dead = [False for _ in streams]
+
+    # Tweak all streams to be non-blocking
+    for i, stream in enumerate(streams):
+
+        # In some cases, if the command dies at start, it will be a string here.
+        if isinstance(stream, str):
+            lines += stream.split('\n')
+            stream_dead[i] = True
+            continue
+
+        fd = stream.fileno()
+        flags = fcntl.fcntl(fd, fcntl.F_GETFL)
+        fcntl.fcntl(fd, fcntl.F_SETFL, flags | os.O_NONBLOCK)
+
+    while len(lines) < max_lines and not all(stream_dead) and time() - start_time < max_seconds:
+        for i, stream in enumerate(streams):
+            if stream_dead[i]:
+                continue
+
+            new_line = stream.readline().decode().strip()
+
+            if new_line:
+                lines.append(new_line)
+
+            sleep(0.1)
+
+    return "\n".join(lines)
+
+
 def _get_docker_ipython_output(context):
     """Get first 16 lines of ipython output if not already retrieved"""
     if hasattr(context, "ipython_stdout"):
         return context.ipython_stdout
-    context.ipython_stdout = timeout(
-        lambda: "\n".join(context.result.stdout.readline().decode() for _ in range(16)),
-        duration=30,
-    )
-    kill_docker_containers(context.project_name)
+
+    try:
+        context.ipython_stdout = _read_lines_with_timeout(
+            context.result.stdout, context.result.stderr,
+            max_lines=16,
+        )
+    finally:
+        kill_docker_containers(context.project_name)
+
     return context.ipython_stdout
 
 
@@ -133,6 +178,7 @@ def exec_kedro_target(context, command):
     """Execute Kedro target"""
     split_command = command.split()
     make_cmd = [context.kedro] + split_command
+    print(make_cmd)
 
     if split_command[0] == "docker" and split_command[1] in ("ipython", "jupyter"):
         context.result = ChildTerminatingPopen(
