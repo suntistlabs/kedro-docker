@@ -29,7 +29,6 @@
 """Behave step definitions for the cli_scenarios feature."""
 import fcntl
 import os
-import sys
 from time import sleep, time
 
 import behave
@@ -67,9 +66,9 @@ def _read_lines_with_timeout(*streams, max_seconds=30, max_lines=100):
             stream_dead[i] = True
             continue
 
-        fd = stream.fileno()
-        flags = fcntl.fcntl(fd, fcntl.F_GETFL)
-        fcntl.fcntl(fd, fcntl.F_SETFL, flags | os.O_NONBLOCK)
+        descriptor = stream.fileno()
+        flags = fcntl.fcntl(descriptor, fcntl.F_GETFL)
+        fcntl.fcntl(descriptor, fcntl.F_SETFL, flags | os.O_NONBLOCK)
 
     while (
         len(lines) < max_lines
