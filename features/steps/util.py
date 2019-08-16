@@ -93,9 +93,7 @@ class TimeoutException(Exception):
     """Exception class for ``timeout()`` function below."""
 
 
-def timeout(
-        func: Callable, duration: int = 10, **kwargs: Any
-) -> Any:
+def timeout(func: Callable, duration: int = 10, **kwargs: Any) -> Any:
     """
     Run specified function until timeout. If success, return the return value
     of specified function. Otherwise throw TimeoutException.

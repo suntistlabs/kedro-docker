@@ -63,7 +63,7 @@ def _read_lines_with_timeout(*streams, max_seconds=30, max_lines=100):
 
         # In some cases, if the command dies at start, it will be a string here.
         if isinstance(stream, str):
-            lines += stream.split('\n')
+            lines += stream.split("\n")
             stream_dead[i] = True
             continue
 
@@ -71,7 +71,11 @@ def _read_lines_with_timeout(*streams, max_seconds=30, max_lines=100):
         flags = fcntl.fcntl(fd, fcntl.F_GETFL)
         fcntl.fcntl(fd, fcntl.F_SETFL, flags | os.O_NONBLOCK)
 
-    while len(lines) < max_lines and not all(stream_dead) and time() - start_time < max_seconds:
+    while (
+        len(lines) < max_lines
+        and not all(stream_dead)
+        and time() - start_time < max_seconds
+    ):
         for i, stream in enumerate(streams):
             if stream_dead[i]:
                 continue
@@ -93,8 +97,7 @@ def _get_docker_ipython_output(context):
 
     try:
         context.ipython_stdout = _read_lines_with_timeout(
-            context.result.stdout, context.result.stderr,
-            max_lines=16,
+            context.result.stdout, context.result.stderr, max_lines=16
         )
     finally:
         kill_docker_containers(context.project_name)
