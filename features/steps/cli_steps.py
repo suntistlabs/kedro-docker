@@ -183,7 +183,6 @@ def exec_kedro_target(context, command):
     """Execute Kedro target"""
     split_command = command.split()
     make_cmd = [context.kedro] + split_command
-    print(make_cmd)
 
     if split_command[0] == "docker" and split_command[1] in ("ipython", "jupyter"):
         context.result = ChildTerminatingPopen(
