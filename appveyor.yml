@@ -36,7 +36,6 @@ install:
   - choco install make
   - make install-pip-setuptools
   - pip install -r test_requirements.txt -U
-  - docker.exe pull --platform linux python:3.6-stretch
 
 build: false
 
