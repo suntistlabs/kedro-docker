@@ -55,7 +55,7 @@ Options:
 * `--gid` - optional integer Group ID for kedro user inside the container. Defaults to the current user's GID
 * `--image` - optional Docker image tag. Defaults to the project directory name
 * `--docker-args` - optional string containing extra options for `docker build` command
-* `-h, --help` - show command help an exit.
+* `-h, --help` - show command help an exit
 
 ### Run your project in a Docker environment
 
