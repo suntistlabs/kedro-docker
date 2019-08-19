@@ -1,4 +1,4 @@
-image: Visual Studio 2017
+image: Windows Server 2019
 
 environment:
   # For debugging: https://www.appveyor.com/docs/how-to/rdp-to-build-worker/
