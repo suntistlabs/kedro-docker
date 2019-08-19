@@ -233,6 +233,7 @@ def modify_kedro_ver(req_file: Path, version: str) -> str:
 def create_new_venv() -> str:
     """
     Create a new venv.
+    Note: Due to a bug in Python 3.5 pip needs to be manually installed.
 
     Returns:
         Path to created venv.
