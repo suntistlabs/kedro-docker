@@ -1,4 +1,4 @@
-FROM python:3.6-buster
+FROM python:3.6-alpine
 
 # install Hadoop
 RUN apt-get update && apt-get install -y default-jdk-headless && rm -rf /var/lib/apt/lists/*
