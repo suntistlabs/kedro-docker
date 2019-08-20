@@ -34,19 +34,19 @@ Feature: Docker commands in new projects
     And I run a non-interactive kedro new
     And I have executed the kedro command "install"
 
-  Scenario: Execute docker-build target
+  Scenario: Execute docker build target
     Given I have removed old docker image of test project
     When I execute the kedro command "docker build"
     Then I should get a successful exit code
     And A new docker image for test project should be created
 
-  Scenario: Execute docker-run target successfully
+  Scenario: Execute docker run target successfully
     Given I have executed the kedro command "docker build"
     When I execute the kedro command "docker run"
     Then I should get a successful exit code
     And I should get a message including "kedro.runner.sequential_runner - INFO - Pipeline execution completed successfully"
 
-  Scenario: Execute docker-run in parallel mode
+  Scenario: Execute docker run in parallel mode
     Given I have executed the kedro command "docker build"
     When I execute the kedro command "docker run --parallel"
     Then I should get a successful exit code
@@ -58,22 +58,22 @@ Feature: Docker commands in new projects
     Then I should get a successful exit code
     And I should get a message including "INFO - Pipeline execution completed successfully"
 
-  Scenario: Execute docker jupyter-notebook target
+  Scenario: Execute docker jupyter notebook target
     Given I have executed the kedro command "docker build"
     When I execute the kedro command "docker jupyter notebook"
     Then Jupyter Notebook should run on port 8888
 
-  Scenario: Execute docker jupyter-notebook target on custom port
+  Scenario: Execute docker jupyter notebook target on custom port
     Given I have executed the kedro command "docker build"
     When I execute the kedro command "docker jupyter notebook --port 8899"
     Then Jupyter Notebook should run on port 8899
 
-  Scenario: Execute docker jupyter-lab target
+  Scenario: Execute docker jupyter lab target
     Given I have executed the kedro command "docker build"
     When I execute the kedro command "docker jupyter lab"
     Then Jupyter Notebook should run on port 8888
 
-  Scenario: Execute docker jupyter-lab target on custom port
+  Scenario: Execute docker jupyter lab target on custom port
     Given I have executed the kedro command "docker build"
     When I execute the kedro command "docker jupyter lab --port 8899"
     Then Jupyter Notebook should run on port 8899
@@ -85,11 +85,11 @@ Feature: Docker commands in new projects
     Then I should get an error exit code
     And Standard error should contain a message including "Error: Port 8890 is already in use on the host. Please specify an alternative port number."
 
-  Scenario: Execute docker kedro-test target
+  Scenario: Execute docker kedro test target
     Given I have executed the kedro command "docker build"
     When I execute the kedro command "docker cmd kedro test"
     Then I should get a successful exit code
-    And I should get a message including "3 passed, 1 warnings"
+    And I should get a message including "2 passed"
     And I should get a message including "/usr/local/bin/python -m pytest"
 
   Scenario: Execute docker cmd without target command
@@ -98,7 +98,7 @@ Feature: Docker commands in new projects
     Then I should get a successful exit code
     And I should get a message including "kedro.runner.sequential_runner - INFO - Pipeline execution completed successfully"
 
-  Scenario: Execute docker kedro-viz target
+  Scenario: Execute docker cmd with non-existent target
     Given I have executed the kedro command "docker build"
     When I execute the kedro command "docker cmd kedro non-existent"
     Then Standard error should contain a message including "Error: No such command "non-existent""
@@ -108,9 +108,29 @@ Feature: Docker commands in new projects
     When I execute the kedro command "docker ipython"
     Then I should see messages from docker ipython startup including "An enhanced Interactive Python"
     And  I should see messages from docker ipython startup including "INFO - ** Kedro project project-dummy"
-    And  I should see messages from docker ipython startup including "INFO - Defined global variables proj_dir, proj_name, conf and io"
+    And  I should see messages from docker ipython startup including "INFO - Defined global variable context"
 
-  Scenario: Execute docker-run target without building image
+  Scenario: Execute docker run target without building image
     Given I have removed old docker image of test project
     When I execute the kedro command "docker run"
     Then I should get an error exit code
+    And Standard error should contain a message including "Error: Unable to find image `project-dummy` locally."
+
+  Scenario: Execute docker dive target
+    Given I have executed the kedro command "docker build"
+    When I execute the kedro command "docker dive"
+    Then I should get a successful exit code
+    And I should get a message including "Result:PASS [Total:3] [Passed:3] [Failed:0] [Warn:0] [Skipped:0]"
+
+  Scenario: Execute docker dive with missing CI config
+    Given I have executed the kedro command "docker build"
+    When I execute the kedro command "docker dive -c non-existent"
+    Then I should get a successful exit code
+    And I should get a message including "file not found, using default CI config"
+    And I should get a message including "Result:PASS [Total:3] [Passed:2] [Failed:0] [Warn:0] [Skipped:1]"
+
+  Scenario: Execute docker dive without building image
+    Given I have removed old docker image of test project
+    When I execute the kedro command "docker dive"
+    Then I should get an error exit code
+    And Standard error should contain a message including "Error: Unable to find image `project-dummy` locally."

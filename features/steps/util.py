@@ -27,7 +27,6 @@
 # limitations under the License.
 
 """Common functions for e2e testing."""
-
 import os
 import subprocess
 import tempfile
@@ -118,7 +117,7 @@ def timeout(func: Callable, duration: int = 10, **kwargs: Any) -> Any:
     def wrapper_func():
         result_dict["result"] = func(**kwargs)
 
-    new_thread = Thread(target=wrapper_func)
+    new_thread = Thread(target=wrapper_func, daemon=True)
     new_thread.start()
 
     while time() <= end and new_thread.is_alive():
@@ -186,6 +185,7 @@ def kill_docker_containers(name: str):
         name: Name (or substring) of docker containers.
     """
     containers_to_stop = get_docker_containers(name)
+
     for container in containers_to_stop:
         container.kill()
 
@@ -234,8 +234,7 @@ def modify_kedro_ver(req_file: Path, version: str) -> str:
 def create_new_venv() -> str:
     """
     Create a new venv.
-
-    Note: Due to a bug in Python 3.5.2 pip needs to be manually installed.
+    Note: Due to a bug in Python 3.5 pip needs to be manually installed.
 
     Returns:
         Path to created venv.

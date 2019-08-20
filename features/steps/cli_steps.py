@@ -35,6 +35,7 @@ from behave import given, then, when
 
 from features.steps.sh_run import ChildTerminatingPopen, run
 from features.steps.util import (
+    TimeoutException,
     download_url,
     get_docker_images,
     kill_docker_containers,
@@ -45,15 +46,64 @@ from features.steps.util import (
 OK_EXIT_CODE = 0
 
 
+def _read_lines_with_timeout(process_handler, max_lines=100):
+    """
+    We want to read from multiple streams, merge outputs together,
+    limiting the number of lines we want.
+    Also don't try for longer than ``timeout`` seconds.
+
+    NOTE: a nice and easy solution might be implemented
+    with ``fcntl`` and non-blocking read, but it's unix-only.
+    """
+    lines = []
+
+    def _read_stdout():
+        # In some cases, if the command dies at start, it will be a string here.
+        stream = process_handler.stdout
+
+        if isinstance(stream, str):
+            lines.extend(stream.split("\n"))
+            return
+
+        while len(lines) < max_lines:
+            new_line = stream.readline().decode().strip()
+
+            if new_line:
+                lines.append(new_line)
+
+            sleep(0.1)
+
+    def _read_stderr():
+        while True:
+            new_line = process_handler.stderr.readline().decode().strip()
+
+            if new_line:
+                lines.append(new_line)
+
+    try:
+        timeout(_read_stdout, duration=30)
+    except TimeoutException:
+        pass
+
+    # Read the remaining error logs if any
+    try:
+        timeout(_read_stderr, duration=3)
+    except TimeoutException:
+        pass
+
+    return "\n".join(lines)
+
+
 def _get_docker_ipython_output(context):
     """Get first 16 lines of ipython output if not already retrieved"""
     if hasattr(context, "ipython_stdout"):
         return context.ipython_stdout
-    context.ipython_stdout = timeout(
-        lambda: "\n".join(context.result.stdout.readline().decode() for _ in range(16)),
-        duration=30,
-    )
-    kill_docker_containers(context.project_name)
+
+    try:
+        context.ipython_stdout = _read_lines_with_timeout(context.result, max_lines=16)
+    finally:
+        kill_docker_containers(context.project_name)
+
     return context.ipython_stdout
 
 
