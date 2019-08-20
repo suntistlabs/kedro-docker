@@ -185,6 +185,7 @@ def kill_docker_containers(name: str):
         name: Name (or substring) of docker containers.
     """
     containers_to_stop = get_docker_containers(name)
+
     for container in containers_to_stop:
         container.kill()
 
