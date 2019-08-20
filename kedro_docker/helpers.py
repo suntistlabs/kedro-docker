@@ -39,7 +39,8 @@ from pathlib import Path, PurePosixPath
 from subprocess import DEVNULL, PIPE
 from typing import List, Sequence, Tuple, Union
 
-from click import ClickException, secho
+from click import secho
+from kedro.cli.utils import KedroCliError
 
 
 def check_docker_image_exists(image: str):
@@ -50,14 +51,14 @@ def check_docker_image_exists(image: str):
         image: Docker image name.
 
     Raises:
-        ClickException: If specified Docker image was not found.
+        KedroCliError: If specified Docker image was not found.
 
     """
     command = ["docker", "images", "-q", image]
     res = subprocess.run(command, stdout=PIPE, stderr=DEVNULL)
     if not res.stdout:
         cmd = "kedro docker build --image {0}".format(image)
-        raise ClickException(
+        raise KedroCliError(
             "Unable to find image `{0}` locally. Please build it first by running:\n"
             "{1}".format(image, cmd)
         )
@@ -108,7 +109,7 @@ def compose_docker_run_args(
             not present in `user_args` list.
         user_args: List of arguments already specified by the user.
     Raises:
-        ClickException: If `mount_volumes` are provided but either `host_root`
+        KedroCliError: If `mount_volumes` are provided but either `host_root`
             or `container_root` are missing.
 
     Returns:
@@ -139,7 +140,7 @@ def compose_docker_run_args(
 
     if mount_volumes:
         if not (host_root and container_root):
-            raise ClickException(
+            raise KedroCliError(
                 "Both `host_root` and `container_root` must "
                 "be specified in `compose_docker_run_args` "
                 "call if `mount_volumes` are provided."
