@@ -1,9 +1,10 @@
 # Release 0.1.1
 
 ## Major features and improvements
+* Add `kedro docker dive` CLI command to run [Dive](https://github.com/wagoodman/dive) analyzer.
 
 ## Bug fixes and other changes
-* Add legal licence header checking as part of circleci.
+* Add legal licence header checking as part of CircleCI.
 * Remove smart quotes from the legal headers.
 * Add Appveyor configuration.
 

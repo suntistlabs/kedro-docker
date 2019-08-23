@@ -68,7 +68,13 @@ setup(
     tests_require=test_requires,
     author="QuantumBlack Labs",
     packages=["kedro_docker"],
-    package_data={"kedro_docker": ["template/Dockerfile", "template/.dockerignore"]},
+    package_data={
+        "kedro_docker": [
+            "template/Dockerfile",
+            "template/.dockerignore",
+            "template/.dive-ci",
+        ]
+    },
     zip_safe=False,
     entry_points={"kedro.project_commands": ["docker = kedro_docker.plugin:commands"]},
 )

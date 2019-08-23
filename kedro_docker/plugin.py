@@ -33,9 +33,8 @@ from pathlib import Path
 from typing import Dict, Tuple, Union
 
 import click
-from click import ClickException
 from kedro.cli import get_project_context
-from kedro.cli.utils import call, forward_command
+from kedro.cli.utils import KedroCliError, call, forward_command
 
 from .helpers import (
     add_jupyter_args,
@@ -51,7 +50,6 @@ NO_DOCKER_MESSAGE = """
 Cannot connect to the Docker daemon. Is the Docker daemon running?
 """
 
-
 DOCKER_DEFAULT_VOLUMES = (
     "conf/local",
     "data",
@@ -60,6 +58,8 @@ DOCKER_DEFAULT_VOLUMES = (
     "references",
     "results",
 )
+
+DIVE_IMAGE = "wagoodman/dive:latest"
 
 
 def _image_callback(ctx, param, value):  # pylint: disable=unused-argument
@@ -70,7 +70,7 @@ def _image_callback(ctx, param, value):  # pylint: disable=unused-argument
 
 def _port_callback(ctx, param, value):  # pylint: disable=unused-argument
     if is_port_in_use(value):
-        raise ClickException(
+        raise KedroCliError(
             "Port {} is already in use on the host. "
             "Please specify an alternative port number.".format(value)
         )
@@ -81,7 +81,7 @@ def _make_port_option(**kwargs):
     defaults = {
         "type": int,
         "default": 8888,
-        "help": "Host port to publish to.",
+        "help": "Host port to publish to",
         "callback": _port_callback,
     }
     kwargs = dict(defaults, **kwargs)
@@ -92,7 +92,7 @@ def _make_image_option(**kwargs):
     defaults = {
         "type": str,
         "default": None,
-        "help": "Docker image tag. Default is the project directory name.",
+        "help": "Docker image tag. Default is the project directory name",
     }
     kwargs = dict(defaults, **kwargs)
     return click.option("--image", **kwargs)
@@ -103,7 +103,7 @@ def _make_docker_args_option(**kwargs):
         "type": str,
         "default": "",
         "callback": lambda ctx, param, value: shlex.split(value),
-        "help": "Optional arguments to be passed to `docker run` command.",
+        "help": "Optional arguments to be passed to `docker run` command",
     }
     kwargs = dict(defaults, **kwargs)
     return click.option("--docker-args", **kwargs)
@@ -115,7 +115,9 @@ def commands():
     pass
 
 
-@commands.group(name="docker")
+@commands.group(
+    name="docker", context_settings=dict(help_option_names=["-h", "--help"])
+)
 def docker_group():
     """Dockerize your Kedro project."""
     # check that docker is running
@@ -124,31 +126,29 @@ def docker_group():
             ["docker", "version"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
         ).returncode
     except FileNotFoundError:
-        raise ClickException(NO_DOCKER_MESSAGE)
+        raise KedroCliError(NO_DOCKER_MESSAGE)
     if res:
-        raise ClickException(NO_DOCKER_MESSAGE)
+        raise KedroCliError(NO_DOCKER_MESSAGE)
 
 
-@docker_group.command(
-    name="build", context_settings=dict(help_option_names=["-h", "--help"])
-)
+@docker_group.command(name="build")
 @click.option(
     "--uid",
     type=int,
     default=None,
     help="User ID for kedro user inside the container. "
-    "Default is the current user's UID.",
+    "Default is the current user's UID",
 )
 @click.option(
     "--gid",
     type=int,
     default=None,
     help="Group ID for kedro user inside the container. "
-    "Default is the current user's GID.",
+    "Default is the current user's GID",
 )
 @_make_image_option()
 @_make_docker_args_option(
-    help="Optional arguments to be passed to `docker build` command."
+    help="Optional arguments to be passed to `docker build` command"
 )
 def docker_build(uid, gid, image, docker_args):
     """Build a Docker image for the project."""
@@ -160,7 +160,10 @@ def docker_build(uid, gid, image, docker_args):
     template_path = Path(__file__).parent / "template"
     verbose = get_project_context("verbose")
     copy_template_files(
-        project_path, template_path, ["Dockerfile", ".dockerignore"], verbose
+        project_path,
+        template_path,
+        ["Dockerfile", ".dockerignore", ".dive-ci"],
+        verbose,
     )
 
     combined_args = compose_docker_run_args(
@@ -297,4 +300,49 @@ def docker_cmd(args, docker_args, image):
     )
 
     command = ["docker", "run"] + _docker_run_args + [image] + list(args)
+    call(command)
+
+
+@docker_group.command(name="dive")
+@click.option(
+    "--ci/--no-ci",
+    "ci_flag",
+    default=True,
+    show_default=True,
+    help="Run Dive in non-interactive mode",
+)
+@click.option(
+    "--ci-config-path",
+    "-c",
+    "dive_ci",
+    default=".dive-ci",
+    show_default=True,
+    type=click.Path(exists=False, dir_okay=False, resolve_path=True),
+    help="Path to `.dive-ci` config file",
+)
+@_make_image_option(callback=_image_callback)
+@_make_docker_args_option()
+def docker_dive(ci_flag, dive_ci, docker_args, image):
+    """Run Dive analyzer of Docker image efficiency."""
+    container_name = make_container_name(image, "dive")
+
+    required_args = [("-v", "/var/run/docker.sock:/var/run/docker.sock")]
+    optional_args = [("--rm", None), ("--name", container_name)]
+
+    if ci_flag:
+        dive_ci = Path(dive_ci).absolute()
+        if dive_ci.is_file():
+            required_args.append(("-v", "{}:/.dive-ci".format(str(dive_ci))))
+        else:
+            msg = "`{}` file not found, using default CI config".format(str(dive_ci))
+            click.secho(msg, fg="yellow")
+        required_args.append(("-e", "CI={}".format(str(ci_flag).lower())))
+    else:
+        optional_args.append(("-it", None))
+
+    _docker_run_args = compose_docker_run_args(
+        required_args=required_args, optional_args=optional_args, user_args=docker_args
+    )
+
+    command = ["docker", "run"] + _docker_run_args + [DIVE_IMAGE] + [image]
     call(command)

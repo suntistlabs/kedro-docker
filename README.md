@@ -29,6 +29,7 @@ pip install kedro-docker
 ## How do I use Kedro-Docker?
 
 ### Prerequisites
+
 The following conditions must be true for Kedro-Docker to package your project:
 
 * Make sure you have [installed](https://docs.docker.com/install/) Docker
@@ -58,7 +59,7 @@ Options:
 * `--gid` - optional integer Group ID for kedro user inside the container. Defaults to the current user's GID
 * `--image` - optional Docker image tag. Defaults to the project directory name
 * `--docker-args` - optional string containing extra options for `docker build` command
-* `-h, --help` - show command help an exit.
+* `-h, --help` - show command help and exit.
 
 ### Run your project in a Docker environment
 
@@ -84,8 +85,8 @@ All other CLI options will be appended to `kedro run` command inside the contain
 Options:
 * `--image` - Docker image name to be used, defaults to project root directory name
 * `--docker-args` - optional string containing extra options for `docker run` command
-* `-h, --help` - show command help an exit
-* Any other options will be treated as `kedro run` command options
+* `-h, --help` - show command help and exit
+* Any other options will be treated as `kedro run` command options.
 
 ### Interactive development with Docker
 
@@ -99,7 +100,7 @@ Options:
 * `--image` - Docker image name to be used, defaults to project root directory name
 * `--docker-args` - optional string containing extra options for `docker run` command
 * `--port` - host port that a container's port will be mapped to, defaults to 8888. This option applies to `kedro docker jupyter` commands only
-* `-h, --help` - show command help an exit
+* `-h, --help` - show command help and exit
 * Any other options will be treated as corresponding `kedro` command CLI options. For example, `kedro docker jupyter lab --NotebookApp.token='' --NotebookApp.password=''` will run Jupyter Lab server without the password and token.
 
 > *Important:* Please note that source code directory of a project (`src` folder) is *not* mounted to the Docker container by default. This means that if you change any code in `src` directory inside the container, those changes will *not* be saved to the host machine and will be completely lost when the container is terminated. In order to mount the whole project when running a Jupyter Lab, for example, run the following command:
@@ -107,6 +108,23 @@ Options:
 ```bash
 kedro docker jupyter lab --docker-args "-v ${PWD}:/home/kedro"
 ```
+
+### Image analysis with Dive
+
+Kedro-Docker allows to analyze the size efficiency of your project image by leveraging [Dive](https://github.com/wagoodman/dive):
+
+```bash
+kedro docker dive
+```
+
+> *Note:* By default Kedro-Docker calls Dive in CI mode. If you want to explore your image in the UI, run `kedro docker dive --no-ci`.
+
+Options:
+* `--ci / --no-ci` - flag for running Dive in non-interactive mode. Defaults to true
+* `--ci-config-path` - path to Dive CI config file. Defaults to `.dive-ci` in the project root directory
+* `--image` - Docker image name to be used, defaults to project root directory name
+* `--docker-args` - optional string containing extra options for `docker run` command
+* `-h, --help` - show command help and exit.
 
 ### Running custom commands with Docker
 
@@ -123,7 +141,25 @@ For example:
 Options:
 * `--image` - Docker image name to be used, defaults to project root directory name
 * `--docker-args` - optional string containing extra options for `docker run` command
-* `-h, --help` - show command help an exit.
+* `-h, --help` - show command help and exit.
+
+## Running Kedro-Docker with [Kedro-Viz](https://github.com/quantumblacklabs/kedro-viz/)
+
+These instructions allow you to access [Kedro-Viz](https://github.com/quantumblacklabs/kedro-viz/), Kedro's data pipeline visualisation tool, via Docker. In your terminal, run the following commands:
+
+```
+pip download -d data --no-deps kedro-viz
+kedro docker build
+kedro docker cmd bash --docker-args="-it -u=0 -p=4141:4141"
+pip install data/*.whl
+kedro viz --host=0.0.0.0 --no-browser
+```
+
+And then open `127.0.0.1:4141` in your preferred browser. Incidentally, if `kedro-viz` is already installed in the Docker container (via requirements) then you can run:
+
+```
+kedro docker cmd --docker-args="-p=4141:4141" kedro viz --host=0.0.0.0
+```
 
 ## Can I contribute?
 
