@@ -31,6 +31,7 @@ cache:
 install:
   - ps: Start-FileDownload 'http://slproweb.com/download/Win64OpenSSL-1_1_1c.exe'
   - ps: Start-Process "Win64OpenSSL-1_1_1c.exe" -ArgumentList "/silent /verysilent /sp- /suppressmsgboxes" -Wait
+  - ps: Switch-DockerLinux
   - "set PATH=%MINICONDA%;%MINICONDA3%\\Scripts;%PATH%"
   - conda create --name kedro-docker python=%PYTHON_VERSION% -y
   - activate kedro-docker
